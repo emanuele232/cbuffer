@@ -22,7 +22,7 @@ public:
     explicit cbuffer(size_type size): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[size];
         _size = size;
-        _inizio = 0;/ std::ostream
+        _inizio = 0;
         _fine = 0;
     }
 
@@ -126,13 +126,13 @@ public:
 
     //operatore [] [LETTURA E SCRITTURA]
     T &operator[](size_type index){
-        assert index < _size;
+        assert(index < _size);
         return _buffer[index];
     }
 
     //operatore [] [LETTURA]
     const T &operator[](size_type index) const {
-        assert index < _size;
+        assert(index < _size);
         return _buffer[index];
     }
 
