@@ -5,20 +5,25 @@
 int main() {
 
     cbuffer<int> d;
-    cbuffer<int> v(3);
+    cbuffer<int> v(4);
     cbuffer<int> c(4, 4);
     cbuffer<int> e(c);
 
     v.enqueue(5);
     v.enqueue(6);
     v.enqueue(7);
-    v.enqueue(77);
-
-    v.dequeue();
-    v.dequeue();
-    v.dequeue();
+    v.enqueue(8);
+    v.enqueue(9);
     
-    v.checkout();
+    cbuffer<int>::iterator a = v.begin();
+
+    std::cout << "primo elemento di v: " << *a <<std::endl;
+    a++;
+    std::cout << "secondo elemento di v: " << *a << std::endl;
+    a++;
+    std::cout << "terzo elemento di v: " << *a << std::endl;
+    a++;
+    std::cout << "primo elemento di v: " << *a << std::endl;
 
     
 
