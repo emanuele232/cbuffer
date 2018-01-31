@@ -178,19 +178,200 @@ public:
         }
         else 
             _fine = (_fine + _size - 1)%_size;
-
+ 
     }
 
-    void checkout(){
-        std::cout << "_size: " << _size << std::endl;
-        std::cout << "_inizio: " << _inizio << std::endl;
-        std::cout << "_fine: " << _fine << std::endl;
+    class const_iterator; //forward declaration
 
-        for(int i = 0; i < _size ; i++){
-            std::cout << "elemento " << i + 1 << ": " << _buffer[i] << std::endl; 
+    class iterator{
+        cbuffer *pnt;
+        int index;
+    
+    public:
+        typedef std::forward_iterator_tag iterator_category;
+        typedef T                         value_type;
+        typedef ptrdiff_t                 difference_type;
+        typedef T*                        pointer;
+        typedef T&                        reference;
+    
+
+        iterator() : pnt(0), index(0) {}
+
+        iterator(const iterator &other) : pnt(other.pnt), index(other.index) {}
+
+        ~iterator() {}
+
+        //ridefinisco l'operatore "="
+        iterator &operator=(const iterator &other) {
+            pnt = other.pnt;
+            index = other.index;
         }
+
+        //ritorna il dato a cui si riferisce l'iteratore 
+        reference operator*() const {
+            return pnt->_buffer[index];
+        }
+
+        //ritorna il puntatore al dato a cui si riferisce l'iteratore
+        pointer operator->() const{
+            reference x = pnt->_buffer[index];
+            return &x;
+        }
+
+        //operatore di post incremento 
+        iterator& operator++(int){
+            iterator tmp(*this);
+            if(index == pnt->_fine )
+                index = pnt->_fine;
+            else {
+                index = (index + 1)%pnt->_size;
+            }
+            return tmp;
+        } 
+
+        //operatore di pre-incremento
+        iterator& operator++() {
+            if(index == pnt->_fine)
+                index = pnt->_inizio;
+            else 
+                index = (index + 1)%pnt->_size;
+            return *this;
+            
+        }
+
+        //operatore di uguaglianza
+        bool operator==(const iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x == y;
+        }
+
+        bool operator!=(const iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x != y;
+        }
+
+        friend class const_iterator;
+
+        bool operator==(const const_iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x == y;
+        }
+
+        bool operator!=(const const_iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x != y;
+        }
+
+    private:
+        friend class cbuffer;
+
+        iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {}
+
+
+    };//classe iterator
+
+    iterator begin() {
+        return iterator(this, this->_inizio);
     }
 
+    iterator end() {
+        return iterator(this, this->_fine);
+    }
+
+
+    class const_iterator{
+        cbuffer *pnt;
+        int index;
+    
+    public:
+        typedef std::forward_iterator_tag iterator_category;
+        typedef T                         value_type;
+        typedef ptrdiff_t                 difference_type;
+        typedef T*                        pointer;
+        typedef T&                        reference;
+    
+
+        const_iterator() : pnt(0), index(0) {}
+
+        const_iterator(const iterator &other) : pnt(other.pnt), index(other.index) {}
+
+        ~const_iterator() {}
+
+        const_iterator &operator=(const const_iterator &other) {
+            pnt = other.pnt;
+            index = other.index;
+        }
+
+        const_iterator &operator=(const iterator &other) {
+            pnt = other.pnt;
+            index = other.index;
+        }
+
+        reference operator*() const {
+            return pnt->_buffer[index];
+        }
+
+        pointer operator->() const{
+            reference x = pnt->_buffer[index];
+            return &x;
+        }
+
+        const_iterator& operator++(int){
+            const_iterator tmp(*this);
+            if(index == pnt->_fine)
+                index = pnt->_inizio;
+            else 
+                index = (index +1)%pnt->_size;
+            return tmp;
+        } 
+
+        const_iterator& operator++() {
+            if(index == pnt->_fine)
+                index = pnt->_inizio;
+            else 
+                index = (index + 1)%pnt->_size;
+            return *this;
+        }
+
+        bool operator==(const const_iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x == y;
+        }
+
+        bool operator!=(const const_iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x != y;
+        }
+
+        friend class iterator;
+
+        bool operator==(const iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x == y;
+        }
+
+        bool operator!=(const iterator &other) const {
+            pointer x = &(pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[index]);
+            return x != y;
+        }
+
+    private:
+        friend class cbuffer;
+
+        const_iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {}
+
+
+    };//classe const iterator
+
+    
 
 private:
     size_type _size;
