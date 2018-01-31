@@ -17,13 +17,20 @@ public:
     typedef T value_type;            //tipo dei valori da inserire
 
     //costruttori [METODI FONDAMENTALI]
-    cbuffer(): _size(0), _buffer(0), _inizio(-1), _fine(-1) {}
+    cbuffer(): _size(0), _buffer(0), _inizio(-1), _fine(-1) {
+
+        #ifndef NDEBUG
+        std::cout << "cbuffer()" << std::endl;
+        #endif
+    }
 
     explicit cbuffer(size_type size): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[size];
         _size = size;
-        _inizio = 0;
-        _fine = 0;
+
+        #ifndef NDEBUG
+        std::cout << "cbuffer(size_type)" << std::endl;
+        #endif
     }
 
     cbuffer(size_type size, const T &value): _size(0), _buffer(0), _inizio(-1), _fine(-1){
@@ -44,12 +51,15 @@ public:
             _buffer = 0;
             throw;
         }
+        #ifndef NDEBUG
+        std::cout << "cbuffer(size_type, const T)" << std::endl;
+        #endif
     }
 
     //copy constructor
     cbuffer(const cbuffer &other): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[other._size];
-        size = other._size;
+        _size = other._size;
         _inizio = other._inizio;
         _fine = other._fine;
 
@@ -65,6 +75,9 @@ public:
             _buffer = 0;
             throw;
         }
+        #ifndef NDEBUG
+        std::cout << "cbuffer(const cbuffer) - copy constructor" << std::endl;
+        #endif
 
     }
 
@@ -126,13 +139,13 @@ public:
 
     //operatore [] [LETTURA E SCRITTURA]
     T &operator[](size_type index){
-        assert(index < _size);
+        assert(index >= _inizio && index <= _fine);
         return _buffer[index];
     }
 
     //operatore [] [LETTURA]
     const T &operator[](size_type index) const {
-        assert(index < _size);
+        assert(index <= _inizio && index >=_fine);
         return _buffer[index];
     }
 
@@ -144,29 +157,40 @@ public:
 	}
 
     void enqueue(const T &value){
-        if(_inizio == _fine && _inizio == 0)
-            return;
-        else if (_fine == _inizio +1){  
-            _fine = (_fine + 1)&_size;
+        if (_fine == _inizio && _inizio == -1){ //coda vuota 
             _inizio = (_inizio + 1)%_size;
-        }
-        else
             _fine = (_fine + 1)%_size;
+        }
+        else if (_inizio == (_fine + 1)%_size){
+            _inizio = (_inizio + 1)%_size;
+            _fine = (_fine + 1)%_size;
+        }
+        else 
+            _fine = _fine + 1;
+
         _buffer[_fine] = value;
-
-
     }
 
     void dequeue(){
-        if(_inizio == _fine && _inizio == 0)
-            return;
-        else if (_inizio == _fine)
-            _fine = _inizio -1;
-        else
-            _fine = (_fine + 1)%_size;
+        if(_inizio == _fine){
+            _inizio = -1;
+            _fine = -1;
+        }
+        else 
+            _fine = (_fine + _size - 1)%_size;
 
-         
     }
+
+    void checkout(){
+        std::cout << "_size: " << _size << std::endl;
+        std::cout << "_inizio: " << _inizio << std::endl;
+        std::cout << "_fine: " << _fine << std::endl;
+
+        for(int i = 0; i < _size ; i++){
+            std::cout << "elemento " << i + 1 << ": " << _buffer[i] << std::endl; 
+        }
+    }
+
 
 private:
     size_type _size;
