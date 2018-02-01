@@ -280,6 +280,7 @@ public:
 
         //ritorna il dato a cui si riferisce l'iteratore 
         reference operator*() const {
+            assert(pnt->_inizio != -1);
             return pnt->_buffer[index];
         }
 
@@ -293,7 +294,7 @@ public:
         iterator& operator++(int){
             iterator tmp(*this);
             if(index == pnt->_fine )
-                index = pnt->_fine;
+                index = pnt->_inizio;
             else {
                 index = (index + 1)%pnt->_size;
             }
@@ -401,6 +402,7 @@ public:
         //operatore di deferenziazione ritorna l'elemento al
         //quale 'literatore si riferisce
         reference operator*() const {
+            assert(_inizio != -1);
             return pnt->_buffer[index];
         }
 
