@@ -9,6 +9,18 @@
 #include <iterator> 
 #include <cstddef> 
 
+/**
+ * @file cbuffer.h
+ * @brief Dichiarazione della classe cbuffer
+**/
+
+/**
+ * @brief Array dinamico di intero 
+ * 
+ * Classe che rappresenta un buffer circolare che accetta 
+ * qualsiasi tipo di dato. La dimensione è fissata a 
+ * costruzione
+**/
 template <typename T>
 class cbuffer{
 
@@ -16,13 +28,25 @@ public:
     typedef unsigned int size_type; //tipo della variabile size
     typedef T value_type;            //tipo dei valori da inserire
 
-    //costruttori [METODI FONDAMENTALI]
+    /**
+     * @brief Costruttore di default (METODO FONDAMENTALE)
+     * 
+     * costruttore di default per istanziare un cbuffer vuoto.
+     * Unico costruttore usabile per creare un array di cbuffer
+    **/
     cbuffer(): _size(0), _buffer(0), _inizio(-1), _fine(-1) {
 
         #ifndef NDEBUG
         std::cout << "cbuffer()" << std::endl;
         #endif
     }
+
+    /**
+     * @brief Costruttore secondario
+     * 
+     * Usato per istanziare un cbuffer con una data dimensione .
+     * @param size Dimensione del buffer. 
+    **/
 
     explicit cbuffer(size_type size): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[size];
@@ -32,6 +56,16 @@ public:
         std::cout << "cbuffer(size_type)" << std::endl;
         #endif
     }
+
+    /**
+     * @brief Costruttore secondario.
+     * 
+     * Usato per istanziare un cbuffer di grandezza size con 
+     * valori value
+     * 
+     * @param size grandezza del buffer.
+     * @param value valore con cui inizializzare il buffer
+    **/
 
     cbuffer(size_type size, const T &value): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[size];
@@ -56,7 +90,13 @@ public:
         #endif
     }
 
-    //copy constructor
+    /**
+     * @brief Copy constructor.
+     * 
+     * inizializza un cbuffer a partire da un altro cbuffer.
+     * 
+     * @param other cbuffer usato per costruire il nuovo cbuffer.
+    **/
     cbuffer(const cbuffer &other): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[other._size];
         _size = other._size;
@@ -81,16 +121,28 @@ public:
 
     }
 
-    //operatore di assegnamento [METODO FONDAMENTALE]
+    /**
+     * @brief Operatore di assegnamento.
+     * 
+     * permette la copia tra cbuffer.
+     * 
+     * @param other cbuffer sorgente.
+    **/ 
     cbuffer &operator=(const cbuffer &other){
         if(this != &other){
-            cbuffer tmp(other);
-            this ->swap(tmp);
+            cbuffer tmp(other); //creiamo un nuovo cbuffer temporaneo
+
+            //modifichiamo i puntatori del vecchio cbuffer per
+            //fargli puntare il nuovo cbuffer. 
+            this ->swap(tmp);   
         }
         return *this;
     }
 
-    //distruttore [METODO FONDAMENTALE]
+    /** @brief Distruttore della classe cbuffer
+     * 
+     * svuota la memoria allocata.
+    **/
     ~cbuffer(){
         delete[] _buffer;
         _size = 0;
@@ -100,7 +152,7 @@ public:
 
     }
 
-    //metodi vari
+    //utilities
 
     //size java style
     size_type get_size() const {
@@ -149,6 +201,12 @@ public:
         return _buffer[index];
     }
 
+    /** @brief metodo di appoggio swap.
+     * 
+     * Scabio i puntatori di un cbuffer con un altro.
+     * 
+     * @param other cbuffer sorgente.
+    **/
     void swap(cbuffer &other) {
 		std::swap(other._size, this->_size);
 		std::swap(other._buffer, this->_buffer);
@@ -156,6 +214,12 @@ public:
         std::swap(other._fine, this->_fine);
 	}
 
+    /** @brief inserimento in coda
+     * 
+     * Enqueue inserisce in coda al buffer il valore value.
+     * 
+     * @param value valore da inserire in coda.
+    **/
     void enqueue(const T &value){
         if (_fine == _inizio && _inizio == -1){ //coda vuota 
             _inizio = (_inizio + 1)%_size;
@@ -171,6 +235,11 @@ public:
         _buffer[_fine] = value;
     }
 
+
+    /**@ brief Cancellazione in testa.
+     * 
+     * Dequeue cancella l'elemento in testa al buffer.
+    **/
     void dequeue(){
         if(_inizio == _fine){
             _inizio = -1;
@@ -183,6 +252,8 @@ public:
 
     class const_iterator; //forward declaration
 
+
+    //implementazione della classe iterator per cbuffer.
     class iterator{
         cbuffer *pnt;
         int index;
@@ -246,6 +317,7 @@ public:
             return x == y;
         }
 
+        //operatore di disuguaglianza
         bool operator!=(const iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
             pointer y = &(other.pnt->_buffer[index]);
@@ -274,15 +346,28 @@ public:
 
     };//classe iterator
 
+
+    /**
+     * @brief iteratore al primo elemento del buffer
+     * 
+     * begin ritorna un oggetto iteratore posizionato al 
+     * primo elemento del buffer in questione.
+    **/ 
     iterator begin() {
         return iterator(this, this->_inizio);
     }
 
+    /**@brief Iteratore all'ultimo elemento del buffer
+     * 
+     * end ritorna un oggetto iteratore posizionato 
+     * all'ultimo elemento del buffer.
+    **/
     iterator end() {
         return iterator(this, this->_fine);
     }
 
 
+    //implementazione della classe const_iterator
     class const_iterator{
         cbuffer *pnt;
         int index;
@@ -301,25 +386,32 @@ public:
 
         ~const_iterator() {}
 
+        //operatore di assegnamento (const_iterator sorgente)
         const_iterator &operator=(const const_iterator &other) {
             pnt = other.pnt;
             index = other.index;
         }
 
+        //operatore di assegnamento (iterator sorgente)
         const_iterator &operator=(const iterator &other) {
             pnt = other.pnt;
             index = other.index;
         }
 
+        //operatore di deferenziazione ritorna l'elemento al
+        //quale 'literatore si riferisce
         reference operator*() const {
             return pnt->_buffer[index];
         }
 
+        //ritorna il puntatore all'elemento al quale l'iteratore
+        //si riferisce
         pointer operator->() const{
             reference x = pnt->_buffer[index];
             return &x;
         }
 
+        //Operatore di post incremento
         const_iterator& operator++(int){
             const_iterator tmp(*this);
             if(index == pnt->_fine)
@@ -329,6 +421,7 @@ public:
             return tmp;
         } 
 
+        //Operatore di pre incremento
         const_iterator& operator++() {
             if(index == pnt->_fine)
                 index = pnt->_inizio;
@@ -337,12 +430,14 @@ public:
             return *this;
         }
 
+        //Operatore di uguaglianza
         bool operator==(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
             pointer y = &(other.pnt->_buffer[index]);
             return x == y;
         }
 
+        //Operatore di disuguaglianza
         bool operator!=(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
             pointer y = &(other.pnt->_buffer[index]);
@@ -374,8 +469,8 @@ public:
     
 
 private:
-    size_type _size;
-    T *_buffer;
+    size_type _size;       //dimensione del buffer
+    T *_buffer;            //puntatore al buffer
     int _inizio;
     int _fine;
 };
