@@ -191,14 +191,20 @@ public:
 
     //operatore [] [LETTURA E SCRITTURA]
     T &operator[](size_type index){
-        assert(index >= _inizio && index <= _fine);
-        return _buffer[index];
+        assert(index <= abs(_fine - _inizio));
+
+        std::cout << "operator[]" << std::endl;
+
+        return _buffer[(_inizio + index)%_size];
     }
 
     //operatore [] [LETTURA]
     const T &operator[](size_type index) const {
-        assert(index <= _inizio && index >=_fine);
-        return _buffer[index];
+        assert(index <= abs(_fine - _inizio));
+
+        std::cout << "const operator[]" << std::endl;
+
+        return _buffer[(_inizio + index)%_size];
     }
 
     /** @brief metodo di appoggio swap.
@@ -467,6 +473,25 @@ public:
 
 
     };//classe const iterator
+
+    /**
+     * @brief iteratore al primo elemento del buffer
+     * 
+     * begin ritorna un oggetto iteratore costante posizionato al 
+     * primo elemento del buffer in questione.
+    **/ 
+    const_iterator begin() const {
+        return const_iterator(this, this->_inizio);
+    }
+
+    /**@brief Iteratore all'ultimo elemento del buffer
+     * 
+     * end ritorna un oggetto iteratore costante posizionato 
+     * all'ultimo elemento del buffer.
+    **/
+    const_iterator end() const {
+        return const_iterator(this, this->_fine);
+    }
 
     
 
