@@ -191,9 +191,9 @@ public:
 
     //operatore [] [LETTURA E SCRITTURA]
     T &operator[](size_type index){
-        assert(index <= abs(_fine - _inizio));
+        assert(index < this->buffer_size());
 
-        std::cout << "operator[]" << std::endl;
+        std::cout << "operator[]" <<  std::endl;
 
         return _buffer[(_inizio + index)%_size];
     }
@@ -205,6 +205,18 @@ public:
         std::cout << "const operator[]" << std::endl;
 
         return _buffer[(_inizio + index)%_size];
+    }
+
+    int buffer_size(){
+        if(_inizio == -1)
+            return 0;
+        else if(_inizio == _fine)
+            return 1;
+        else if(_inizio < _fine)
+            return _fine - _inizio + 1;
+        else {
+            return (_size - _inizio) + _fine + 1;
+        } 
     }
 
     /** @brief metodo di appoggio swap.
@@ -228,8 +240,8 @@ public:
     **/
     void enqueue(const T &value){
         if (_fine == _inizio && _inizio == -1){ //coda vuota 
-            _inizio = (_inizio + 1)%_size;
-            _fine = (_fine + 1)%_size;
+            _inizio = 0;
+            _fine = 0;
         }
         else if (_inizio == (_fine + 1)%_size){
             _inizio = (_inizio + 1)%_size;
@@ -274,7 +286,11 @@ public:
 
         iterator() : pnt(0), index(0) {}
 
-        iterator(const iterator &other) : pnt(other.pnt), index(other.index) {}
+        iterator(const iterator &other) : pnt(other.pnt), index(other.index) {
+            #ifndef NDEBUG
+            std::cout << "iterator(iterator &other)" << std::endl;
+            #endif
+        }
 
         ~iterator() {}
 
@@ -286,7 +302,7 @@ public:
 
         //ritorna il dato a cui si riferisce l'iteratore 
         reference operator*() const {
-            assert(pnt->_inizio != -1);
+            assert(index < pnt->buffer_size());
             return pnt->_buffer[index];
         }
 
@@ -298,9 +314,10 @@ public:
 
         //operatore di post incremento 
         iterator& operator++(int){
+            assert(index < pnt->_size);
             iterator tmp(*this);
             if(index == pnt->_fine )
-                index = pnt->_inizio;
+                index = pnt->_size;
             else {
                 index = (index + 1)%pnt->_size;
             }
@@ -309,8 +326,9 @@ public:
 
         //operatore di pre-incremento
         iterator& operator++() {
+            assert(index < pnt->fine);
             if(index == pnt->_fine)
-                index = pnt->_inizio;
+                index = pnt->_size;
             else 
                 index = (index + 1)%pnt->_size;
             return *this;
@@ -320,14 +338,14 @@ public:
         //operatore di uguaglianza
         bool operator==(const iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x == y;
         }
 
         //operatore di disuguaglianza
         bool operator!=(const iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x != y;
         }
 
@@ -335,20 +353,24 @@ public:
 
         bool operator==(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x == y;
         }
 
         bool operator!=(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x != y;
         }
 
     private:
         friend class cbuffer;
 
-        iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {}
+        iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {
+            #ifndef NDEBUG
+            std::cout << "iterator(*pnt, index)" << std::endl;
+            #endif
+        }
 
 
     };//classe iterator
@@ -361,7 +383,8 @@ public:
      * primo elemento del buffer in questione.
     **/ 
     iterator begin() {
-        return iterator(this, this->_inizio);
+        return iterator(this , this->_inizio);
+
     }
 
     /**@brief Iteratore all'ultimo elemento del buffer
@@ -370,7 +393,8 @@ public:
      * all'ultimo elemento del buffer.
     **/
     iterator end() {
-        return iterator(this, this->_fine);
+        return iterator(this, this->_size);
+        
     }
 
 
