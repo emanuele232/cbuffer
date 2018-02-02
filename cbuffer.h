@@ -188,25 +188,41 @@ public:
 		return _buffer[index]; 
 	}
 
-
-    //operatore [] [LETTURA E SCRITTURA]
+    /**
+      @brief operatore [] [LETTURA E SCRITTURA]
+      *vogliamo accedere all'elemento di posizione "index"
+      *dall'inizio del cbuffer (NON DALL'INIZIO DEL BUFFER)
+      *e quindi sommiamo di quanti inizi l'elemento è discosto
+      *dall'inizio logico del cbuffer, in quanto l'inizio 
+      *dell'allocazione di memoria e l'inizio logico del cbuffer
+      *potebbero non coincidere
+    **/
     T &operator[](size_type index){
-        assert(index < this->buffer_size());
+        int posizione = (_inizio + index)%_size;
+        assert(posizione < this->buffer_size());
 
         std::cout << "operator[]" <<  std::endl;
 
-        return _buffer[(_inizio + index)%_size];
+        return _buffer[posizione];
     }
 
     //operatore [] [LETTURA]
     const T &operator[](size_type index) const {
-        assert(index <= abs(_fine - _inizio));
+        int posizione = (_inizio + index)%_size;
+        assert(posizione < this->buffer_size());
 
-        std::cout << "const operator[]" << std::endl;
+        std::cout << "operator[]" <<  std::endl;
 
-        return _buffer[(_inizio + index)%_size];
+        return _buffer[posizione];
     }
 
+    /**
+     * @brief buffer_size è la memoria in uso al momento
+     * 
+     * buffer_size restituisce quante celle sono usate al 
+     * momento della chiamata sfruttando gli indici logici
+     * _inizio e _fine del buffer
+    **/
     int buffer_size(){
         if(_inizio == -1)
             return 0;
@@ -302,7 +318,7 @@ public:
 
         //ritorna il dato a cui si riferisce l'iteratore 
         reference operator*() const {
-            assert(index < pnt->buffer_size());
+            assert(index < pnt->_size);
             return pnt->_buffer[index];
         }
 
