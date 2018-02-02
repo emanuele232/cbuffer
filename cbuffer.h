@@ -432,7 +432,7 @@ public:
         //operatore di deferenziazione ritorna l'elemento al
         //quale 'literatore si riferisce
         reference operator*() const {
-            assert(_inizio != -1);
+            assert(index < pnt->buffer_size());
             return pnt->_buffer[index];
         }
 
@@ -445,9 +445,10 @@ public:
 
         //Operatore di post incremento
         const_iterator& operator++(int){
+            assert(index < pnt->_size);
             const_iterator tmp(*this);
             if(index == pnt->_fine)
-                index = pnt->_inizio;
+                index = pnt->_size;
             else 
                 index = (index +1)%pnt->_size;
             return tmp;
@@ -456,7 +457,7 @@ public:
         //Operatore di pre incremento
         const_iterator& operator++() {
             if(index == pnt->_fine)
-                index = pnt->_inizio;
+                index = pnt->_size;
             else 
                 index = (index + 1)%pnt->_size;
             return *this;
@@ -493,7 +494,7 @@ public:
     private:
         friend class cbuffer;
 
-        const_iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {}
+        const_iterator(const cbuffer *pnt, int index): pnt(pnt), index(index) {}
 
 
     };//classe const iterator
