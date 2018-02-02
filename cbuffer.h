@@ -448,7 +448,7 @@ public:
         //operatore di deferenziazione ritorna l'elemento al
         //quale 'literatore si riferisce
         reference operator*() const {
-            assert(index < pnt->buffer_size());
+            assert(index < pnt->_size);
             return pnt->_buffer[index];
         }
 
@@ -531,7 +531,7 @@ public:
      * all'ultimo elemento del buffer.
     **/
     const_iterator end() const {
-        return const_iterator(this, this->_fine);
+        return const_iterator(this, this->_size);
     }
 
     
