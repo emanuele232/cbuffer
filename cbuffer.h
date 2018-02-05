@@ -121,6 +121,31 @@ public:
 
     }
 
+    template<typename Q> 
+    cbuffer(size_type size, Q _begin, Q _end){
+        _buffer = new T[size];
+        _size = size;
+        _inizio = -1;
+        _fine = -1;
+        int i = 0;
+
+        try{
+            for(_begin, _end ; _begin != _end; _begin++, i++){
+                enqueue(*_begin);
+            }
+        }
+        catch(...){
+            delete[] _buffer;
+            _size = 0;
+            _buffer = 0;
+            throw;
+        }
+
+        #ifndef NDEBUG
+        std::cout << "cbuffer (Q,T)" << std::endl;
+        #endif
+    }
+
     /**
      * @brief Operatore di assegnamento.
      * 
@@ -166,20 +191,23 @@ public:
 
     //valore all'indice i java style
     T get_value(size_type index) const {
-        assert(index < _size);
-        return _buffer[index];
+        int posizione = (_inizio + index)%_size;
+        assert(posizione < buffer_size() && index < _size);
+        return _buffer[posizione];
     }
 
     //set il valore all'indice i java style
     void set_value(size_type index, const T &value) {
-        assert (index < _size);
-        _buffer[index] = value;
+        int posizione = (_inizio + index)%_size;
+        assert(posizione < this->buffer_size() && index < _size);
+        _buffer[posizione] = value;
     }
 
     //valore all'indice i c++ style [LETTURA E SCRITTURA]
     T &value(size_type index) {
-		assert(index < _size); // asserzione se viene violata il programma termina
-		return _buffer[index];
+		int posizione = (_inizio + index)%_size;
+        assert(posizione < this->buffer_size() && index < _size);
+		return _buffer[posizione];
 	}
 
     //set value all'indice i c++ style [SOLO LETTURA]
@@ -223,7 +251,7 @@ public:
      * momento della chiamata sfruttando gli indici logici
      * _inizio e _fine del buffer
     **/
-    int buffer_size(){
+    int buffer_size() const{
         if(_inizio == -1)
             return 0;
         else if(_inizio == _fine)
