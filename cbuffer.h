@@ -339,7 +339,7 @@ public:
         ~iterator() {}
 
         //ridefinisco l'operatore "="
-        iterator &operator=(const iterator &other) {
+        iterator& operator=(const iterator &other) {
             pnt = other.pnt;
             index = other.index;
         }
@@ -357,7 +357,7 @@ public:
         }
 
         //operatore di post incremento 
-        iterator& operator++(int){
+        iterator& operator++(int index){
             assert(index < pnt->_size);
             iterator tmp(*this);
             if(index == pnt->_fine )
@@ -427,8 +427,11 @@ public:
      * primo elemento del buffer in questione.
     **/ 
     iterator begin() {
-        return iterator(this , this->_inizio);
+        #ifndef NDEBUG
+        std::cout << "iterator begin"  << std::endl;
+        #endif
 
+        return iterator(this , this->_inizio);
     }
 
     /**@brief Iteratore all'ultimo elemento del buffer
@@ -437,40 +440,47 @@ public:
      * all'ultimo elemento del buffer.
     **/
     iterator end() {
+        #ifndef NDEBUG
+        std::cout << " iterator end"  << std::endl;
+        #endif
+
         return iterator(this, this->_size);
-        
     }
 
 
     //implementazione della classe const_iterator
     class const_iterator{
-        cbuffer *pnt;
+        const cbuffer *pnt;
         int index;
     
     public:
         typedef std::forward_iterator_tag iterator_category;
         typedef T                         value_type;
         typedef ptrdiff_t                 difference_type;
-        typedef T*                        pointer;
-        typedef T&                        reference;
+        typedef const T*                        pointer;
+        typedef const T&                        reference;
     
 
         const_iterator() : pnt(0), index(0) {}
+
+        const_iterator(const const_iterator &other) : pnt(other.pnt), index(other.index) {}
 
         const_iterator(const iterator &other) : pnt(other.pnt), index(other.index) {}
 
         ~const_iterator() {}
 
         //operatore di assegnamento (const_iterator sorgente)
-        const_iterator &operator=(const const_iterator &other) {
+        const_iterator& operator=(const const_iterator &other) {
             pnt = other.pnt;
             index = other.index;
+            return *this;
         }
 
         //operatore di assegnamento (iterator sorgente)
-        const_iterator &operator=(const iterator &other) {
+        const_iterator& operator=(const iterator &other) {
             pnt = other.pnt;
             index = other.index;
+            return *this;
         }
 
         //operatore di deferenziazione ritorna l'elemento al
@@ -489,7 +499,6 @@ public:
 
         //Operatore di post incremento
         const_iterator& operator++(int){
-            assert(index < pnt->_size);
             const_iterator tmp(*this);
             if(index == pnt->_fine)
                 index = pnt->_size;
@@ -550,7 +559,7 @@ public:
      * primo elemento del buffer in questione.
     **/ 
     const_iterator begin() const {
-        return const_iterator(this, this->_inizio);
+        return const_iterator(this, this->_inizio);   
     }
 
     /**@brief Iteratore all'ultimo elemento del buffer
