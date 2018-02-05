@@ -357,7 +357,7 @@ public:
         }
 
         //operatore di post incremento 
-        iterator& operator++(int index){
+        iterator& operator++(int){
             assert(index < pnt->_size);
             iterator tmp(*this);
             if(index == pnt->_fine )
@@ -370,7 +370,7 @@ public:
 
         //operatore di pre-incremento
         iterator& operator++() {
-            assert(index < pnt->fine);
+            assert(index < pnt->_size);
             if(index == pnt->_fine)
                 index = pnt->_size;
             else 
@@ -519,14 +519,14 @@ public:
         //Operatore di uguaglianza
         bool operator==(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x == y;
         }
 
         //Operatore di disuguaglianza
         bool operator!=(const const_iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x != y;
         }
 
@@ -534,13 +534,13 @@ public:
 
         bool operator==(const iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x == y;
         }
 
         bool operator!=(const iterator &other) const {
             pointer x = &(pnt->_buffer[index]);
-            pointer y = &(other.pnt->_buffer[index]);
+            pointer y = &(other.pnt->_buffer[other.index]);
             return x != y;
         }
 
