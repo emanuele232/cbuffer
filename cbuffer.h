@@ -191,29 +191,30 @@ public:
 
     //valore all'indice i java style
     T get_value(size_type index) const {
+        assert(index < buffer_size());
         int posizione = (_inizio + index)%_size;
-        assert(posizione < buffer_size() && index < _size);
         return _buffer[posizione];
     }
 
     //set il valore all'indice i java style
     void set_value(size_type index, const T &value) {
+        assert(index < buffer_size());
         int posizione = (_inizio + index)%_size;
-        assert(posizione < this->buffer_size() && index < _size);
         _buffer[posizione] = value;
     }
 
     //valore all'indice i c++ style [LETTURA E SCRITTURA]
     T &value(size_type index) {
+        assert(index < buffer_size());
 		int posizione = (_inizio + index)%_size;
-        assert(posizione < this->buffer_size() && index < _size);
 		return _buffer[posizione];
 	}
 
     //set value all'indice i c++ style [SOLO LETTURA]
     const T &value(size_type index) const {
-		assert(index < _size); // asserzione se viene violata il programma termina
-		return _buffer[index]; 
+		assert(index < buffer_size()); // asserzione se viene violata il programma termina
+        int posizione = (_inizio + index)%_size;
+		return _buffer[posizione]; 
 	}
 
     /**
@@ -226,16 +227,15 @@ public:
       *potebbero non coincidere
     **/
     T &operator[](size_type index){
+        assert(index < buffer_size());
         int posizione = (_inizio + index)%_size;
-        assert(posizione < this->buffer_size());
-
         return _buffer[posizione];
     }
 
     //operatore [] [LETTURA]
     const T &operator[](size_type index) const {
+        assert(index < buffer_size());
         int posizione = (_inizio + index)%_size;
-        assert(posizione < this->buffer_size());
 
         return _buffer[posizione];
     }
@@ -423,10 +423,6 @@ public:
      * primo elemento del buffer in questione.
     **/ 
     iterator begin() {
-        #ifndef NDEBUG
-        std::cout << "iterator begin"  << std::endl;
-        #endif
-
         return iterator(this , this->_inizio);
     }
 
@@ -436,10 +432,6 @@ public:
      * all'ultimo elemento del buffer.
     **/
     iterator end() {
-        #ifndef NDEBUG
-        std::cout << " iterator end"  << std::endl;
-        #endif
-
         return iterator(this, this->_size);
     }
 
@@ -576,10 +568,21 @@ private:
     int _fine;
 };
 
+template <typename T>
+std::ostream& operator<<(std::ostream &os, 
+	const cbuffer<T> & cb) {
+
+	for (typename cbuffer<T>::size_type i = 0; i < cb.buffer_size(); ++i)
+		os << cb[i] << " ";
+
+	return os;
+}
+
 template <typename T, typename P>
 void inline evaluate_if(const cbuffer<T> cb, const P &predicato){
     for (int i = 0; i < cb.buffer_size(); i++){
-        if(predicato(cb[i]) == 1)  std::cout << "[" << i << "]: true" << std::endl;
+
+        if( predicato(cb[i]) == 1 )  std::cout << "[" << i << "]: true" << std::endl;
         else std::cout << "[" << i << "]: false" << std::endl;
     } 
 }
