@@ -229,8 +229,6 @@ public:
         int posizione = (_inizio + index)%_size;
         assert(posizione < this->buffer_size());
 
-        std::cout << "operator[]" <<  std::endl;
-
         return _buffer[posizione];
     }
 
@@ -238,8 +236,6 @@ public:
     const T &operator[](size_type index) const {
         int posizione = (_inizio + index)%_size;
         assert(posizione < this->buffer_size());
-
-        std::cout << "operator[]" <<  std::endl;
 
         return _buffer[posizione];
     }
@@ -579,5 +575,13 @@ private:
     int _inizio;
     int _fine;
 };
+
+template <typename T, typename P>
+void inline evaluate_if(const cbuffer<T> cb, const P &predicato){
+    for (int i = 0; i < cb.buffer_size(); i++){
+        if(predicato(cb[i]) == 1)  std::cout << "[" << i << "]: true" << std::endl;
+        else std::cout << "[" << i << "]: false" << std::endl;
+    } 
+}
 
 #endif
