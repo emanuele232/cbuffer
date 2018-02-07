@@ -37,7 +37,7 @@ public:
     cbuffer(): _size(0), _buffer(0), _inizio(-1), _fine(-1) {
 
         #ifndef NDEBUG
-        std::cout << "cbuffer()" << std::endl;
+        std::cout << "\ncbuffer()" << std::endl;
         #endif
     }
 
@@ -53,7 +53,7 @@ public:
         _size = size;
 
         #ifndef NDEBUG
-        std::cout << "cbuffer(size_type)" << std::endl;
+        std::cout << "\ncbuffer(size_type)" << std::endl;
         #endif
     }
 
@@ -70,13 +70,10 @@ public:
     cbuffer(size_type size, const T &value): _size(0), _buffer(0), _inizio(-1), _fine(-1){
         _buffer = new T[size];
         _size = size;
-        _inizio = 0;
-        _fine = 0;
 
         try{
-            for(size_type i = 0; i < size; ++i){
-                _buffer[i] = value;
-                _fine++;
+            for(size_type i = 0; i < size; i++){
+                push_back(value);
             }
         }
         catch(...){
@@ -86,7 +83,7 @@ public:
             throw;
         }
         #ifndef NDEBUG
-        std::cout << "cbuffer(size_type, const T)" << std::endl;
+        std::cout << "\ncbuffer(size_type, const T)" << std::endl;
         #endif
     }
 
@@ -116,11 +113,19 @@ public:
             throw;
         }
         #ifndef NDEBUG
-        std::cout << "cbuffer(const cbuffer) - copy constructor" << std::endl;
+        std::cout << "\ncbuffer(const cbuffer) - copy constructor" << std::endl;
         #endif
 
     }
 
+    /*
+    *@brief costruttore cbuffer data un size e due iteratori generici
+    *
+    *Questo costruttore istanzia un cbuffer di un certa dimensione con i valori
+    *indicati da una coppia di iteratori generici Q.
+    *il tipo T del cbuffer deve essere lo stesso degli iteratori di tipo Q.
+    *il compilatore gestisce la conversione da Q a T.
+    */ 
     template<typename Q> 
     cbuffer(size_type size, Q _begin, Q _end){
         _buffer = new T[size];
@@ -131,7 +136,7 @@ public:
 
         try{
             for(_begin, _end ; _begin != _end; _begin++, i++){
-                enqueue(*_begin);
+                push_back(*_begin);
             }
         }
         catch(...){
@@ -142,7 +147,7 @@ public:
         }
 
         #ifndef NDEBUG
-        std::cout << "cbuffer (Q,T)" << std::endl;
+        std::cout << "\ncbuffer (Q,T)" << std::endl;
         #endif
     }
 
@@ -278,7 +283,7 @@ public:
      * 
      * @param value valore da inserire in coda.
     **/
-    void enqueue(const T &value){
+    void push_back(const T &value){
         if (_fine == _inizio && _inizio == -1){ //coda vuota 
             _inizio = 0;
             _fine = 0;
@@ -288,7 +293,7 @@ public:
             _fine = (_fine + 1)%_size;
         }
         else 
-            _fine = _fine + 1;
+            _fine = (_fine + 1)%_size;
 
         _buffer[_fine] = value;
     }
@@ -298,14 +303,13 @@ public:
      * 
      * Dequeue cancella l'elemento in testa al buffer.
     **/
-    void dequeue(){
+    void pop(){
         if(_inizio == _fine){
             _inizio = -1;
             _fine = -1;
         }
         else 
             _fine = (_fine + _size - 1)%_size;
- 
     }
 
     class const_iterator; //forward declaration
@@ -328,7 +332,7 @@ public:
 
         iterator(const iterator &other) : pnt(other.pnt), index(other.index) {
             #ifndef NDEBUG
-            std::cout << "iterator(iterator &other)" << std::endl;
+            std::cout << "\niterator(iterator &other)" << std::endl;
             #endif
         }
 
@@ -353,7 +357,7 @@ public:
         }
 
         //operatore di post incremento 
-        iterator& operator++(int){
+        iterator operator++(int){
             assert(index < pnt->_size);
             iterator tmp(*this);
             if(index == pnt->_fine )
@@ -408,7 +412,7 @@ public:
 
         iterator(cbuffer *pnt, int index): pnt(pnt), index(index) {
             #ifndef NDEBUG
-            std::cout << "iterator(*pnt, index)" << std::endl;
+            std::cout << "\niterator(*pnt, index)" << std::endl;
             #endif
         }
 
@@ -486,7 +490,7 @@ public:
         }
 
         //Operatore di post incremento
-        const_iterator& operator++(int){
+        const_iterator operator++(int){
             const_iterator tmp(*this);
             if(index == pnt->_fine)
                 index = pnt->_size;
@@ -573,7 +577,7 @@ std::ostream& operator<<(std::ostream &os,
 	const cbuffer<T> & cb) {
 
 	for (typename cbuffer<T>::size_type i = 0; i < cb.buffer_size(); ++i)
-		os << cb[i] << " ";
+		os << cb[i] << std::endl;
 
 	return os;
 }
